@@ -1,4 +1,5 @@
 import feedparser
+import csv
 from datetime import datetime
 
 feeds = {
@@ -8,13 +9,17 @@ feeds = {
     "SecurityWeek": "https://feeds.feedburner.com/securityweek"
 }
 
-print("\nLatest Cybersecurity News\n")
-print("=" * 40)
+filename = "cybersecurity_news.csv"
 
-for source, url in feeds.items():
-    print(f"\nSource: {source}")
-    feed = feedparser.parse(url)
+with open(filename, "w", newline="", encoding="utf-8") as file:
+    writer = csv.writer(file)
+    writer.writerow(["Source", "Title", "Published", "Link"])
 
-    for entry in feed.entries[:5]:
-        print(f"\n{entry.title}")
-        print(entry.link)
+    for source, url in feeds.items():
+        feed = feedparser.parse(url)
+
+        for entry in feed.entries[:5]:
+            published = entry.get("published", "Unknown")
+            writer.writerow([source, entry.title, published, entry.link])
+
+print(f"\nNews saved to {filename}")
